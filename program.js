@@ -19,16 +19,33 @@ const data = [{ id: 1, first: "Rob", second: "Choi", managerId: 2 },
 { id: 2, first: "Joseph", second: "Grant" },
 { id: 3, first: "Andy", second: "Zuckerman", managerId: 1 },
 { id: 4, first: "Mark", second: "O'Donnell", managerId: 1 }];
-let root = null;
-const obj = data.reduce((acc, cur) => {
-    Object.assign(acc[cur.id] = acc[cur.id] || {}, cur);
-    if (!cur.managerId) {
-        root = cur.id;
-    }
-    acc[cur.managerId] = acc[cur.managerId] || {};
-    acc[cur.managerId][cur.id] = acc[cur.id];
-    return acc;
-}, {});
 
-console.log(obj[root]);
+const printTree = (root, space = 4, level = 0) => {
+    if (root) {
+        console.log(" ".repeat(level), root.first + " " + root.second);
+        for (const i of root.reporters) {
+            printTree(i, space, level + space);
+        }
+    }
+};
+
+const buildingTree = (data) => {
+    const obj = {};
+    let root;
+    for (const i of data) {
+        obj[i.id] = { reporters: [], ...obj[i.id], ...i };
+
+        if (i.managerId) {
+            obj[i.managerId] = { reporters: [], ...obj[i.managerId] };
+            obj[i.managerId].reporters.push(obj[i.id]);
+        }
+        else {
+            root = obj[i.id];
+        }
+    }
+    return root;
+};
+
+
+printTree(buildingTree(data));
 
